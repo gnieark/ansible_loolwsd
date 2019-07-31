@@ -1,0 +1,34 @@
+---
+- name: install needed packages
+  apt:
+    name: ['apt-transport-https','dirmngr','python-openssl','openssl']
+    state: latest
+
+- name: Add apt key for collabora online repos
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: 0C54D189F4BA284D
+
+- name: "add collabora repo"
+  apt_repository:
+    repo: deb  https://www.collaboraoffice.com/repos/CollaboraOnline/CODE-debian9 ./
+    state: present
+  notify: reload apt cache
+
+- name: install Collabora Online Packages
+  apt:
+    name: ['loolwsd','code-brand']
+    state: latest
+
+
+- name: Set loolwsd config
+  template:
+    src:  templates/loolwsd.xml
+    dest: /etc/loolwsd/loolwsd.xml
+  register: configloolwsd
+
+- name: Restart loolwsd
+  service:
+    name: loolwsd
+    state: restarted
+  when: configloolwsd.changed

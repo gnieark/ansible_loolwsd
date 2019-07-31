@@ -1,0 +1,4 @@
+---
+- name: reload apt cache
+  apt:
+    update_cache: yes
